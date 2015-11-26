@@ -54,6 +54,8 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
+import java.util.UUID;
+
 /**
  * This class launches the camera view, allows the user to take a picture,
  * closes the camera view, and returns the captured image. When the camera view
@@ -69,6 +71,7 @@ public class NativeCameraLauncher extends CordovaPlugin {
 	private int targetHeight;
 	private Uri imageUri;
 	private File photo;
+	private String fileName;
 	private static final String _DATA = "_data";
 	private CallbackContext callbackContext;
 
@@ -93,6 +96,7 @@ public class NativeCameraLauncher extends CordovaPlugin {
 				this.targetWidth = args.getInt(3);
 				this.mQuality = args.getInt(0);
 				this.takePicture();
+				this.fileName = UUID.randomUUID().toString().replaceAll("-", "") + ".jpg";
 				PluginResult r = new PluginResult(PluginResult.Status.NO_RESULT);
 				r.setKeepCallback(true);
 				callbackContext.sendPluginResult(r);
@@ -116,7 +120,7 @@ public class NativeCameraLauncher extends CordovaPlugin {
 	}
 
 	private File createCaptureFile() {
-		File photo = new File(getTempDirectoryPath(this.cordova.getActivity().getApplicationContext()), "Pic.jpg");
+		File photo = new File(getTempDirectoryPath(this.cordova.getActivity().getApplicationContext()), this.fileName);
 		return photo;
 	}
 
@@ -129,7 +133,7 @@ public class NativeCameraLauncher extends CordovaPlugin {
 				// during compression
 				ExifHelper exif = new ExifHelper();
 				exif.createInFile(getTempDirectoryPath(this.cordova.getActivity().getApplicationContext())
-						+ "/Pic.jpg");
+						+ "/" + this.fileName);
 				exif.readExifData();
 				rotate = exif.getOrientation();
 
